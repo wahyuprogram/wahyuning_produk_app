@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: "Aplikasi TYAS",
+      title: "Aplikasi Produk",
       // Pastikan home mengarah ke ProdukPage
       home: ProdukPage(), 
       debugShowCheckedModeBanner: false,

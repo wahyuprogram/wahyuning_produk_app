@@ -44,7 +44,8 @@ class _ProdukDetailState extends State<ProdukDetail> {
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         if (data['success'] != null) {
-           Navigator.pop(context, 'update'); // Kembali ke list dengan sinyal update
+           // MENGIRIM SINYAL DELETE
+           Navigator.pop(context, 'delete'); 
         } else {
            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal menghapus")));
         }
@@ -57,55 +58,76 @@ class _ProdukDetailState extends State<ProdukDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Detail Produk')),
-      body: Center(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            // TAMPILKAN GAMBAR BESAR
-            (widget.produk.foto != null && widget.produk.foto != "")
-              ? Image.network(
-                  "$baseUrl/uploads/${widget.produk.foto}",
-                  height: 200,
-                  fit: BoxFit.cover,
-                  errorBuilder: (ctx, err, stack) => const Icon(Icons.broken_image, size: 100),
-                )
-              : const Icon(Icons.image_not_supported, size: 100),
-            
-            const SizedBox(height: 20),
-            Text("Kode : ${widget.produk.kodeProduk}", style: const TextStyle(fontSize: 20)),
-            Text("Nama : ${widget.produk.namaProduk}", style: const TextStyle(fontSize: 18)),
-            Text("Harga : Rp ${widget.produk.hargaProduk}", style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 20),
-            
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                      // Masuk ke halaman Edit
-                      var result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProdukForm(produk: widget.produk),
+      backgroundColor: Colors.grey[100], 
+      appBar: AppBar(
+        title: const Text('Detail Produk'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 1, 
+      ),
+      body: Center( 
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Card( 
+            color: Colors.white,
+            elevation: 3,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min, 
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: (widget.produk.foto != null && widget.produk.foto != "")
+                      ? Image.network(
+                          "$baseUrl/uploads/${widget.produk.foto}", height: 200, fit: BoxFit.cover,
+                          errorBuilder: (ctx, err, stack) => const Icon(Icons.broken_image, size: 100, color: Colors.grey),
                         )
-                      );
-                      // Jika sukses edit, kembali ke list agar refresh
-                      if (result == 'update') {
-                        Navigator.pop(context, 'update');
-                      }
-                  }, 
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                  child: const Text("Edit", style: TextStyle(color: Colors.white)),
-                ),
-                ElevatedButton(
-                  onPressed: confirmHapus,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: const Text("Hapus", style: TextStyle(color: Colors.white)),
-                ),
-              ],
-            )
-          ],
+                      : const Icon(Icons.image_not_supported, size: 100, color: Colors.grey),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  Text("Kode : ${widget.produk.kodeProduk}", style: const TextStyle(fontSize: 18, color: Colors.grey)),
+                  const SizedBox(height: 8),
+                  Text("${widget.produk.namaProduk}", style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                  const SizedBox(height: 8),
+                  Text("Rp ${widget.produk.hargaProduk}", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.teal)),
+                  
+                  const SizedBox(height: 30),
+                  
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                            var result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ProdukForm(produk: widget.produk))
+                            );
+                            // MENERUSKAN SINYAL EDIT KE HALAMAN UTAMA
+                            if (result == 'edit' || result == 'update') {
+                              Navigator.pop(context, 'edit');
+                            }
+                        }, 
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                        icon: const Icon(Icons.edit, color: Colors.white, size: 18),
+                        label: const Text("Edit", style: TextStyle(color: Colors.white)),
+                      ),
+                      
+                      ElevatedButton.icon(
+                        onPressed: confirmHapus,
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                        icon: const Icon(Icons.delete, color: Colors.white, size: 18),
+                        label: const Text("Hapus", style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
